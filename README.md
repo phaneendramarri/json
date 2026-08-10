@@ -13,7 +13,7 @@
 
 ## How to Use
 
-1. **Visit the Tool**: [Live Site](https://phaneendra73.github.io/json/)
+1. **Visit the Tool**: [Live Site](https://phaneendramarri.github.io/json/)
 2. **Paste JSON**: Insert your raw JSON data into the input area on the left side of the screen.
 3. **Click Format**: Press the "Format" button to beautify your JSON data.
 4. **View Results**: Your formatted JSON will appear on the right side.
@@ -24,8 +24,4 @@
 - **Frontend**: HTML, CSS, JavaScript
 - **Ace Editor**: For advanced syntax highlighting and editing.
 - **JSON Parsing and Validation**: JavaScript for formatting and validation.
-
-## Hosting
-
-The tool is hosted at **https://phaneendra73.github.io/json/**.
 
