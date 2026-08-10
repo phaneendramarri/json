@@ -1,277 +1,449 @@
-let inputEditor, outputEditor;
-const uploadButton = document.getElementById('uploadButton');
-const downloadButton = document.getElementById('downloadButton');
-const copyButton = document.getElementById('copyButton');
-const themeToggleButton = document.getElementById('themeToggle');
-const themeSelect = document.getElementById('themeSelect');
-const findInputButton = document.getElementById('findInputButton');
-const findOutputButton = document.getElementById('findOutputButton');
-const replaceInputButton = document.getElementById('replaceInputButton');
-const replaceOutputButton = document.getElementById('replaceOutputButton');
-const uploadFileInput = document.getElementById('uploadFile');
-const validateButton = document.getElementById('validateButton');
+/* ============================================================
+   Best JSON Formatter — App logic
+   Vanilla JS. Ace Editor for the panes, localStorage for state.
+   ============================================================ */
 
-function initializeAce() {
-  inputEditor = ace.edit('jsonInput');
-  inputEditor.setTheme('ace/theme/github'); // Default light theme
-  inputEditor.session.setMode('ace/mode/json');
-  inputEditor.setOptions({
-    showLineNumbers: true,
-    printMargin: false,
-    wrap: true,
-    tabSize: 2,
-  });
+(function () {
+  'use strict';
 
-  outputEditor = ace.edit('jsonOutput');
-  outputEditor.setTheme('ace/theme/github'); // Default light theme
-  outputEditor.session.setMode('ace/mode/json');
-  outputEditor.setOptions({
-    showLineNumbers: true,
-    printMargin: false,
-    wrap: true,
-    tabSize: 2,
-  });
-}
+  /* ---------- Element refs ---------- */
+  const uploadButton = document.getElementById('uploadButton');
+  const downloadButton = document.getElementById('downloadButton');
+  const copyButton = document.getElementById('copyButton');
+  const themeToggleButton = document.getElementById('themeToggle');
+  const themeSelect = document.getElementById('themeSelect');
+  const findInputButton = document.getElementById('findInputButton');
+  const findOutputButton = document.getElementById('findOutputButton');
+  const replaceInputButton = document.getElementById('replaceInputButton');
+  const replaceOutputButton = document.getElementById('replaceOutputButton');
+  const uploadFileInput = document.getElementById('uploadFile');
+  const validateButton = document.getElementById('validateButton');
+  const statusbar = document.querySelector('.statusbar');
+  const statusText = document.getElementById('statusText');
+  const statusStats = document.getElementById('statusStats');
+  const siteHeader = document.getElementById('siteHeader');
 
-// Set the theme for both page and Ace editors
-function setTheme(pageTheme, aceTheme) {
-  const isDark = pageTheme === 'dark';
-  document.body.classList.toggle('dark-theme', isDark);
-  themeToggleButton.textContent = isDark ? '🌞' : '🌙';
-  inputEditor.setTheme(`ace/theme/${aceTheme}`);
-  outputEditor.setTheme(`ace/theme/${aceTheme}`);
-  themeSelect.value = aceTheme; // Set the value of the dropdown to the selected editor theme
-  localStorage.setItem('pageTheme', pageTheme); // Store page theme
-  localStorage.setItem('editorTheme', aceTheme); // Store Ace editor theme
-}
+  let inputEditor;
+  let outputEditor;
+  let debounceTimer = null;
+  let focusPane = null;   // 'input' | 'output' | 'all' | null
+  let lastEditor = 'input';
 
-// Store the input JSON in localStorage
-function storeJSON() {
-  const inputJSON = inputEditor.getValue();
-  localStorage.setItem('jsonInput', inputJSON); // Store input JSON
-}
+  const INDENT = 2;
 
-// Check and apply themes and JSON content from localStorage or set defaults
-function checkAndApplyThemeAndJSON() {
-  const savedPageTheme = localStorage.getItem('pageTheme') || 'light'; // Default to 'light' if no theme saved
-  const savedEditorTheme = localStorage.getItem('editorTheme') || 'github'; // Default to 'github' if no editor theme saved
-  setTheme(savedPageTheme, savedEditorTheme); // Apply both themes
+  /* ---------- Ace setup ---------- */
+  function initializeAce() {
+    const options = {
+      showLineNumbers: true,
+      showPrintMargin: false,
+      printMargin: false,
+      wrap: true,
+      tabSize: INDENT,
+      useSoftTabs: true,
+      fontFamily: "'JetBrains Mono', Consolas, monospace",
+      fontSize: '14px',
+    };
 
-  const savedJsonInput = localStorage.getItem('jsonInput') || ''; // Default to empty if no input JSON
-  if (savedJsonInput.trim()) {
-    inputEditor.setValue(savedJsonInput, -1); // Set saved input JSON in the editor
-    formatJSON(); // Format the JSON input on initial load
+    inputEditor = ace.edit('jsonInput');
+    inputEditor.setTheme('ace/theme/github');
+    inputEditor.session.setMode('ace/mode/json');
+    inputEditor.setOptions(options);
+
+    outputEditor = ace.edit('jsonOutput');
+    outputEditor.setTheme('ace/theme/github');
+    outputEditor.session.setMode('ace/mode/json');
+    outputEditor.setOptions(options);
   }
-}
 
-// Toggle page and Ace editor theme and store preferences in localStorage
-themeToggleButton.addEventListener('click', () => {
-  const currentPageTheme = document.body.classList.contains('dark-theme')
-    ? 'dark'
-    : 'light';
-  const newPageTheme = currentPageTheme === 'dark' ? 'light' : 'dark';
-  const newEditorTheme = newPageTheme === 'dark' ? 'monokai' : 'github'; // Change editor theme based on page theme
-  setTheme(newPageTheme, newEditorTheme); // Set both page and editor themes
-});
+  /* ---------- Status bar ---------- */
+  function setStatus(state, message) {
+    // state: 'idle' | 'ok' | 'error'
+    statusbar.classList.toggle('is-ok', state === 'ok');
+    statusbar.classList.toggle('is-error', state === 'error');
+    statusText.textContent = message;
+  }
 
-// Change Ace Editor theme based on selected dropdown and store selection
-themeSelect.addEventListener('change', (event) => {
-  const selectedTheme = event.target.value;
-  inputEditor.setTheme(`ace/theme/${selectedTheme}`);
-  outputEditor.setTheme(`ace/theme/${selectedTheme}`);
-  localStorage.setItem('editorTheme', selectedTheme);
-});
+  function updateStats(text) {
+    if (!text || !text.trim()) {
+      statusStats.textContent = '';
+      return;
+    }
+    const lines = text.split('\n').length;
+    const bytes = new Blob([text]).size;
+    statusStats.textContent = `${lines} line${lines === 1 ? '' : 's'} · ${formatBytes(bytes)}`;
+  }
 
-// Store JSON when the user interacts (e.g., before page unload)
-window.addEventListener('beforeunload', storeJSON);
+  function formatBytes(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
 
-// Initialize Ace editor and check for saved themes and JSON on page load
-initializeAce();
-checkAndApplyThemeAndJSON();
+  /* ---------- JSON helpers ---------- */
+  function parseErrorPosition(error, text) {
+    // V8: "Unexpected token } in JSON at position 123"
+    const posMatch = /position (\d+)/i.exec(error.message);
+    if (posMatch) {
+      const pos = Number(posMatch[1]);
+      const upTo = text.slice(0, pos);
+      const line = upTo.split('\n').length;
+      const col = pos - upTo.lastIndexOf('\n');
+      return { line, col };
+    }
+    // Firefox: "line 3 column 5"
+    const lcMatch = /line (\d+) column (\d+)/i.exec(error.message);
+    if (lcMatch) return { line: Number(lcMatch[1]), col: Number(lcMatch[2]) };
+    return null;
+  }
 
-// Handle file upload by clicking the Upload JSON button
-uploadButton.addEventListener('click', () => {
-  uploadFileInput.click();
-});
-// Automatically format the JSON when the input changes
-inputEditor.session.on('change', function () {
-  formatJSON();
-});
-// Handle file upload (once a file is selected)
-uploadFileInput.addEventListener('change', handleFileUpload);
+  function friendlyError(error, text) {
+    const where = parseErrorPosition(error, text);
+    // Trim noisy modern V8 snippets: '... "..." is not valid JSON'
+    const short = error.message
+      .replace(/in JSON at position \d+/i, '')
+      .replace(/,?\s*["']?\.\.\..*is not valid JSON$/is, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return where ? `Invalid JSON — line ${where.line}, col ${where.col}: ${short}` : `Invalid JSON: ${short}`;
+  }
 
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (file && file.type === 'application/json') {
+  /* ---------- Core: live format ---------- */
+  function formatJSON() {
+    const input = inputEditor.getValue();
+
+    if (!input.trim()) {
+      outputEditor.setValue('', -1);
+      setStatus('idle', 'Ready — paste JSON to begin');
+      updateStats('');
+      return;
+    }
+
+    try {
+      const formatted = JSON.stringify(JSON.parse(input), null, INDENT);
+      outputEditor.setValue(formatted, -1);
+      setStatus('ok', 'Valid JSON — formatted');
+      updateStats(formatted);
+    } catch (error) {
+      // Never destroy the user's input; just report.
+      setStatus('error', friendlyError(error, input));
+      updateStats(input);
+    }
+  }
+
+  function scheduleFormat() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(formatJSON, 250);
+  }
+
+  /* ---------- Themes ---------- */
+  function setTheme(pageTheme, aceTheme) {
+    const isDark = pageTheme === 'dark';
+    document.body.classList.toggle('dark-theme', isDark);
+    themeToggleButton.setAttribute('aria-pressed', String(isDark));
+    inputEditor.setTheme(`ace/theme/${aceTheme}`);
+    outputEditor.setTheme(`ace/theme/${aceTheme}`);
+    themeSelect.value = aceTheme;
+    localStorage.setItem('pageTheme', pageTheme);
+    localStorage.setItem('editorTheme', aceTheme);
+  }
+
+  function checkAndApplyThemeAndJSON() {
+    const savedPageTheme = localStorage.getItem('pageTheme') || 'light';
+    const savedEditorTheme = localStorage.getItem('editorTheme') || 'github';
+    setTheme(savedPageTheme, savedEditorTheme);
+
+    const savedJsonInput = localStorage.getItem('jsonInput') || '';
+    if (savedJsonInput.trim()) {
+      inputEditor.setValue(savedJsonInput, -1);
+      formatJSON();
+    }
+  }
+
+  function storeJSON() {
+    localStorage.setItem('jsonInput', inputEditor.getValue());
+  }
+
+  /* ---------- Button feedback ---------- */
+  function flashButton(button, label, restoreAfter = 1600) {
+    const original = button.dataset.originalLabel || button.textContent;
+    button.dataset.originalLabel = original;
+    button.textContent = label;
+    clearTimeout(button._flashTimer);
+    button._flashTimer = setTimeout(() => {
+      button.textContent = original;
+    }, restoreAfter);
+  }
+
+  /* ---------- Events ---------- */
+  function bindEvents() {
+    // Theme toggle
+    themeToggleButton.addEventListener('click', () => {
+      const isDark = document.body.classList.contains('dark-theme');
+      setTheme(isDark ? 'light' : 'dark', isDark ? 'github' : 'monokai');
+    });
+
+    // Editor theme dropdown
+    themeSelect.addEventListener('change', (event) => {
+      const selected = event.target.value;
+      inputEditor.setTheme(`ace/theme/${selected}`);
+      outputEditor.setTheme(`ace/theme/${selected}`);
+      localStorage.setItem('editorTheme', selected);
+    });
+
+    // Live format (debounced) + persist
+    inputEditor.session.on('change', () => {
+      scheduleFormat();
+      storeJSON();
+    });
+    window.addEventListener('beforeunload', storeJSON);
+
+    // Track last-used editor for the "F" focus shortcut
+    inputEditor.on('focus', () => { lastEditor = 'input'; });
+    outputEditor.on('focus', () => { lastEditor = 'output'; });
+
+    // Upload
+    uploadButton.addEventListener('click', () => uploadFileInput.click());
+    uploadFileInput.addEventListener('change', handleFileUpload);
+
+    // Download
+    downloadButton.addEventListener('click', () => {
+      const jsonData = outputEditor.getValue();
+      try {
+        const jsonObject = JSON.parse(jsonData);
+        const blob = new Blob([JSON.stringify(jsonObject, null, INDENT)], {
+          type: 'application/json',
+        });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `formatted-${Date.now()}.json`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        flashButton(downloadButton, 'Saved ✓');
+      } catch (error) {
+        setStatus('error', 'Nothing valid to download — fix the JSON first');
+      }
+    });
+
+    // Copy
+    copyButton.addEventListener('click', () => {
+      const jsonData = outputEditor.getValue();
+      if (!jsonData.trim()) {
+        setStatus('idle', 'Nothing to copy yet');
+        return;
+      }
+      navigator.clipboard
+        .writeText(jsonData)
+        .then(() => flashButton(copyButton, 'Copied ✓'))
+        .catch(() => setStatus('error', 'Copy failed — clipboard unavailable'));
+    });
+
+    // Validate
+    validateButton.addEventListener('click', () => {
+      const input = inputEditor.getValue();
+      if (!input.trim()) {
+        setStatus('idle', 'Nothing to validate yet');
+        return;
+      }
+      try {
+        const formatted = JSON.stringify(JSON.parse(input), null, INDENT);
+        outputEditor.setValue(formatted, -1);
+        setStatus('ok', 'Valid JSON');
+        updateStats(formatted);
+        flashButton(validateButton, 'Valid ✓');
+      } catch (error) {
+        setStatus('error', friendlyError(error, input));
+        flashButton(validateButton, 'Invalid ✕');
+      }
+    });
+
+    // Find / replace
+    findInputButton.addEventListener('click', () => inputEditor.execCommand('find'));
+    findOutputButton.addEventListener('click', () => outputEditor.execCommand('find'));
+    replaceInputButton.addEventListener('click', () => inputEditor.execCommand('replace'));
+    replaceOutputButton.addEventListener('click', () => outputEditor.execCommand('replace'));
+
+    // Format / minify per pane
+    document.getElementById('formatInputButton').addEventListener('click', () => transformInPlace(inputEditor, true));
+    document.getElementById('formatOutputButton').addEventListener('click', () => transformInPlace(outputEditor, true));
+    document.getElementById('minifyInputButton').addEventListener('click', () => transformInPlace(inputEditor, false));
+    document.getElementById('minifyOutputButton').addEventListener('click', () => transformInPlace(outputEditor, false));
+
+    // Fold all (output)
+    document.getElementById('foldOutputButton').addEventListener('click', () => {
+      outputEditor.session.foldAll();
+    });
+
+    // Focus mode — expand one editor to fill the screen
+    document.getElementById('focusInputButton').addEventListener('click', () => toggleFocus('input'));
+    document.getElementById('focusOutputButton').addEventListener('click', () => toggleFocus('output'));
+
+    // Fullscreen — both editors side by side
+    document.getElementById('focusAllButton').addEventListener('click', () => toggleFocus('all'));
+
+    // Footer actions
+    document.getElementById('footerFullscreen').addEventListener('click', () => {
+      document.getElementById('tool').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => toggleFocus('all'), 400);
+    });
+    document.getElementById('backToTop').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    document.getElementById('footerYear').textContent = String(new Date().getFullYear());
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && focusPane) {
+        exitFocus();
+        return;
+      }
+      // "F" toggles focus on the last-used editor, "Shift+F" fullscreen — never while typing
+      if ((event.key === 'f' || event.key === 'F') && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        const el = event.target;
+        const tag = (el.tagName || '').toLowerCase();
+        const typing =
+          tag === 'input' || tag === 'textarea' || tag === 'select' ||
+          el.isContentEditable || (el.closest && el.closest('.ace_editor'));
+        if (!typing) {
+          event.preventDefault();
+          if (event.shiftKey) {
+            toggleFocus('all');
+          } else {
+            toggleFocus(focusPane && focusPane !== 'all' ? focusPane : lastEditor);
+          }
+        }
+      }
+    });
+
+    // Mobile pane tabs
+    document.querySelectorAll('.pane-tab').forEach((tab) => {
+      tab.addEventListener('click', () => switchPane(tab.dataset.pane));
+    });
+
+    // Header shadow on scroll
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  /* Format (true) or minify (false) an editor's content in place. */
+  function transformInPlace(editor, pretty) {
+    const value = editor.getValue();
+    if (!value.trim()) return;
+    try {
+      const result = JSON.stringify(JSON.parse(value), null, pretty ? INDENT : 0);
+      editor.setValue(result, -1);
+      setStatus('ok', pretty ? 'Formatted' : 'Minified');
+      updateStats(result);
+    } catch (error) {
+      setStatus('error', friendlyError(error, value));
+    }
+  }
+
+  function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const looksJson = file.type === 'application/json' || /\.json$/i.test(file.name);
+    if (!looksJson) {
+      setStatus('error', 'Please choose a .json file');
+      uploadFileInput.value = '';
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = function (e) {
-      const content = e.target.result;
-      try {
-        inputEditor.setValue(content);
-        const parsedJSON = JSON.parse(content);
-        const formattedJSON = JSON.stringify(parsedJSON, null, 4);
-        outputEditor.setValue(formattedJSON);
-      } catch (error) {
-        outputEditor.setValue('Invalid JSON');
-      }
+      inputEditor.setValue(String(e.target.result), -1);
+      formatJSON();
+      switchPane('output');
     };
     reader.readAsText(file);
-  } else {
-    alert('Please upload a valid JSON file.');
+    uploadFileInput.value = '';
   }
-}
 
-// Format JSON (pretty print)
-function formatJSON() {
-  const input = inputEditor.getValue();
-  try {
-    const formatted = JSON.stringify(JSON.parse(input), null, 4);
-    outputEditor.setValue(formatted);
-  } catch (error) {
-    outputEditor.setValue('Invalid JSON');
-  }
-}
+  /* ---------- Focus mode ---------- */
+  function toggleFocus(name) {
+    if (focusPane === name) {
+      exitFocus();
+      return;
+    }
+    focusPane = name;
+    document.body.classList.add('has-focus');
+    const workbench = document.querySelector('.workbench');
+    const inputPane = document.getElementById('inputPane');
+    const outputPane = document.getElementById('outputPane');
 
-// Handle JSON download
-downloadButton.addEventListener('click', () => {
-  const jsonData = outputEditor.getValue();
-  try {
-    const jsonObject = JSON.parse(jsonData);
-    const blob = new Blob([JSON.stringify(jsonObject, null, 4)], {
-      type: 'application/json',
+    workbench.classList.toggle('is-focus', name === 'all');
+    inputPane.classList.toggle('is-focus', name === 'input');
+    outputPane.classList.toggle('is-focus', name === 'output');
+
+    // On mobile fullscreen, make sure both panes are reachable via tabs
+    if (name === 'all') {
+      inputPane.classList.add('is-active');
+      outputPane.classList.remove('is-active');
+      switchPane('input');
+    }
+
+    const editor = name === 'output' ? outputEditor : inputEditor;
+    requestAnimationFrame(() => {
+      inputEditor.resize();
+      outputEditor.resize();
+      editor.focus();
     });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `formatted${Date.now()}.json`;
-    link.click();
-  } catch (error) {
-    alert('Invalid JSON. Please format your JSON before downloading.');
   }
-});
 
-// Handle JSON copy to clipboard
-copyButton.addEventListener('click', () => {
-  const jsonData = outputEditor.getValue();
-  navigator.clipboard
-    .writeText(jsonData)
-    .then(() => {
-      copyButton.textContent = 'Copied ✔';
-      setTimeout(() => {
-        copyButton.textContent = 'Copy';
-      }, 2000);
-    })
-    .catch(() => {
-      alert('Failed to copy to clipboard.');
+  function exitFocus() {
+    focusPane = null;
+    document.body.classList.remove('has-focus');
+    document.querySelector('.workbench').classList.remove('is-focus');
+    document.getElementById('inputPane').classList.remove('is-focus');
+    document.getElementById('outputPane').classList.remove('is-focus');
+    requestAnimationFrame(() => {
+      inputEditor.resize();
+      outputEditor.resize();
     });
-});
-
-// Search functionality for input editor
-findInputButton.addEventListener('click', () => {
-  inputEditor.execCommand('find');
-});
-
-// Search functionality for output editor
-findOutputButton.addEventListener('click', () => {
-  outputEditor.execCommand('find');
-});
-
-// Replace functionality for input editor
-replaceInputButton.addEventListener('click', () => {
-  inputEditor.execCommand('replace');
-});
-
-// Replace functionality for output editor
-replaceOutputButton.addEventListener('click', () => {
-  outputEditor.execCommand('replace');
-});
-
-// Format Input JSON function (to be used for the "Format" button in input editor)
-function formatInputJSON() {
-  const input = inputEditor.getValue(); // Get input JSON value
-  try {
-    const formatted = JSON.stringify(JSON.parse(input), null, 4); // Format the input
-    inputEditor.setValue(formatted); // Set formatted JSON back in the input editor
-  } catch (error) {
-    inputEditor.setValue('Invalid JSON'); // If invalid, show error message
   }
-}
 
-// Format Output JSON function (to be used for the "Format" button in output editor)
-function formatOutputJSON() {
-  const output = outputEditor.getValue(); // Get output JSON value
-  try {
-    const formatted = JSON.stringify(JSON.parse(output), null, 4); // Format the output
-    outputEditor.setValue(formatted); // Set formatted JSON back in the output editor
-  } catch (error) {
-    outputEditor.setValue('Invalid JSON'); // If invalid, show error message
+  /* ---------- Mobile pane switcher ---------- */
+  function switchPane(name) {
+    document.querySelectorAll('.pane-tab').forEach((tab) => {
+      const active = tab.dataset.pane === name;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', String(active));
+    });
+    document.getElementById('inputPane').classList.toggle('is-active', name === 'input');
+    document.getElementById('outputPane').classList.toggle('is-active', name === 'output');
+    // Ace needs a resize nudge after becoming visible
+    const editor = name === 'input' ? inputEditor : outputEditor;
+    requestAnimationFrame(() => editor.resize());
   }
-}
 
-// Handle Format for input JSON (from input editor)
-document.getElementById('formatInputButton').addEventListener('click', () => {
-  formatInputJSON(); // Call format function to format the JSON in input editor
-});
-
-// Handle Format for output JSON (from output editor)
-document.getElementById('formatOutputButton').addEventListener('click', () => {
-  formatOutputJSON(); // Call format function to format the JSON in output editor
-});
-// Minify Input JSON function (to be used for the "Minify" button in input editor)
-function minifyInputJSON() {
-  const input = inputEditor.getValue(); // Get input JSON value
-  try {
-    const minified = JSON.stringify(JSON.parse(input)); // Minify the input (remove spaces)
-    inputEditor.setValue(minified); // Set minified JSON back in the input editor
-  } catch (error) {
-    inputEditor.setValue('Invalid JSON'); // If invalid, show error message
+  /* ---------- Header scroll state ---------- */
+  function onScroll() {
+    siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);
   }
-}
 
-// Minify Output JSON function (to be used for the "Minify" button in output editor)
-function minifyOutputJSON() {
-  const output = outputEditor.getValue(); // Get output JSON value
-  try {
-    const minified = JSON.stringify(JSON.parse(output)); // Minify the output (remove spaces)
-    outputEditor.setValue(minified); // Set minified JSON back in the output editor
-  } catch (error) {
-    outputEditor.setValue('Invalid JSON'); // If invalid, show error message
+  /* ---------- Scroll reveal ---------- */
+  function initReveal() {
+    const items = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+    items.forEach((el) => observer.observe(el));
   }
-}
 
-// Handle Minify for input JSON (from input editor)
-document.getElementById('minifyInputButton').addEventListener('click', () => {
-  minifyInputJSON(); // Call minify function to minify the JSON in input editor
-});
-
-// Handle Minify for output JSON (from output editor)
-document.getElementById('minifyOutputButton').addEventListener('click', () => {
-  minifyOutputJSON(); // Call minify function to minify the JSON in output editor
-});
-
-// Validate JSON from the input editor and display the result in the output editor
-
-validateButton.addEventListener('click', () => {
-  const input = inputEditor.getValue();
-  try {
-    const parsedJSON = JSON.parse(input); // Validate JSON
-    const formattedJSON = JSON.stringify(parsedJSON, null, 4); // Optional: Format JSON
-    outputEditor.setValue(formattedJSON);
-    validateButton.textContent = 'Valid ✔';
-    setTimeout(() => {
-      validateButton.textContent = 'Validate';
-    }, 2000);
-  } catch (error) {
-    outputEditor.setValue('Invalid JSON');
-    validateButton.textContent = 'Invalid ✘';
-    setTimeout(() => {
-      validateButton.textContent = 'Validate';
-    }, 2000);
-  }
-});
-
-// Set up the "Fold All" button for the Output Editor
-document
-  .getElementById('foldOutputButton')
-  .addEventListener('click', function () {
-    outputEditor.session.foldAll(); // Fold all objects/arrays in the output editor
-  });
+  /* ---------- Boot ---------- */
+  initializeAce();
+  bindEvents();
+  checkAndApplyThemeAndJSON();
+  initReveal();
+})();

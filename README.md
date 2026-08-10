@@ -1,27 +1,30 @@
-# JSON Formatter
+# Best JSON Formatter
 
 ## Overview
 
-**This JSON Formatter** is a fast, ad-free, and user-friendly tool to format, beautify, and validate your JSON data. This tool uses **Ace Editor** for efficient JSON editing and displays results in real-time with syntax highlighting.
+**Best JSON Formatter** is a fast, free, ad-free tool to format, validate, minify, and beautify JSON — entirely in your browser. Nothing you paste ever leaves your machine. Built with vanilla HTML, CSS, and JavaScript, with the **Ace Editor** powering the editing experience.
+
+**Live site:** https://phaneendramarri.github.io/json/
 
 ## Features
 
-- **JSON Formatting**: Paste your raw JSON data, and it will be beautified with proper indentation and structure.
-- **Error Checking**: Detect invalid JSON input and display error messages.
-- **Light/Dark Themes**: Easily switch between light and dark modes for a comfortable viewing experience.
-- **No Ads**: Enjoy an ad-free environment for a smooth user experience.
+- **Live formatting** — output updates as you type (debounced), with syntax highlighting.
+- **Honest validation** — invalid JSON is reported with line & column; your input is never overwritten.
+- **Minify / Format** in either pane, plus find & replace and code folding.
+- **Upload & download** `.json` files, or copy the result to your clipboard.
+- **Light & dark themes** plus 7 Ace editor themes, remembered via `localStorage`.
+- **Private by design** — 100% client-side, no ads, no tracking.
+- **Responsive** — side-by-side panes on desktop, intentional Input/Output tabs on mobile.
 
 ## How to Use
 
-1. **Visit the Tool**: [Live Site](https://phaneendramarri.github.io/json/)
-2. **Paste JSON**: Insert your raw JSON data into the input area on the left side of the screen.
-3. **Click Format**: Press the "Format" button to beautify your JSON data.
-4. **View Results**: Your formatted JSON will appear on the right side.
-5. **Copy the Output**: Copy the formatted JSON from the output panel by clicking "Copy".
+1. Paste raw JSON into the **Input** pane (or upload a `.json` file).
+2. The **Output** pane formats it live; hit **Validate** for a clear verdict.
+3. **Copy** or **Download** the clean result.
 
 ## Technologies Used
 
-- **Frontend**: HTML, CSS, JavaScript
-- **Ace Editor**: For advanced syntax highlighting and editing.
-- **JSON Parsing and Validation**: JavaScript for formatting and validation.
+- **Frontend**: HTML, CSS (custom design system, no frameworks), vanilla JavaScript
+- **Ace Editor**: syntax highlighting, find/replace, folding
+- **Fonts**: Fraunces, Inter, JetBrains Mono
 

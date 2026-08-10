@@ -4,101 +4,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Best JSON Formatter - Format, validate, minify, and beautify your JSON easily.">
-    <meta name="keywords" content="JSON, Formatter, JSON Formatter, Minify JSON, Validate JSON, Beautify JSON">
-    <meta name="author" content="Phaneendra">
+    <meta name="description" content="Best JSON Formatter — a fast, free, ad-free online tool to format, validate, minify, and beautify JSON. 100% client-side: your data never leaves your browser.">
+    <meta name="keywords" content="JSON formatter, JSON validator, JSON beautifier, minify JSON, format JSON online, JSON pretty print, free JSON tool, validate JSON online">
+    <meta name="author" content="Phaneendra Marri">
     <meta name="robots" content="index, follow">
-    <title>Best JSON Formatter</title>
-    <!-- Favicon -->
-    <link rel="icon" href="assests/favicon.svg" type="image/png">
-    <!-- Include Style -->
+    <meta name="theme-color" content="#00c96e">
+    <title>Best JSON Formatter — Format, Validate &amp; Minify JSON Online Free</title>
+
+    <link rel="icon" href="assests/favicon.svg" type="image/svg+xml">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
-    <!-- Include Ace Editor -->
+
+    <!-- Ace Editor -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-searchbox.js"></script>
 
-    <!-- Open Graph Meta Tags for better social media sharing -->
-    <meta property="og:title" content="Best JSON Formatter">
-    <meta property="og:description"
-        content="Format, validate, minify, and beautify your JSON easily with the Best JSON Formatter tool.">
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/56/JSON_Formatter.svg">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Best JSON Formatter">
+    <meta property="og:title" content="Best JSON Formatter — Format, Validate &amp; Minify JSON">
+    <meta property="og:description" content="A fast, free, ad-free JSON formatter that runs entirely in your browser. Paste, format, validate, and ship — nothing leaves your machine.">
     <meta property="og:url" content="https://phaneendramarri.github.io/json/">
+    <meta property="og:image" content="https://phaneendramarri.github.io/json/assests/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
-    <!-- Twitter Meta Tags for better social sharing -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Best JSON Formatter">
-    <meta name="twitter:description"
-        content="Format, validate, minify, and beautify your JSON easily with the Best JSON Formatter tool.">
-    <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/56/JSON_Formatter.svg">
+    <meta name="twitter:site" content="@phaneendraMarri">
+    <meta name="twitter:creator" content="@phaneendraMarri">
+    <meta name="twitter:title" content="Best JSON Formatter — Format, Validate &amp; Minify JSON">
+    <meta name="twitter:description" content="A fast, free, ad-free JSON formatter that runs entirely in your browser. Paste, format, validate, and ship.">
+    <meta name="twitter:image" content="https://phaneendramarri.github.io/json/assests/og-image.png">
 
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://phaneendramarri.github.io/JSON_Formatter/">
+    <link rel="canonical" href="https://phaneendramarri.github.io/json/">
 
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Best JSON Formatter",
+      "url": "https://phaneendramarri.github.io/json/",
+      "description": "A fast, free, ad-free online tool to format, validate, minify, and beautify JSON. 100% client-side.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": {
+        "@type": "Person",
+        "name": "Phaneendra Marri",
+        "url": "https://github.com/phaneendramarri",
+        "sameAs": [
+          "https://github.com/phaneendramarri",
+          "https://in.linkedin.com/in/phaneendramarri",
+          "https://twitter.com/phaneendra73_",
+          "https://www.instagram.com/tech_telusa/"
+        ]
+      }
+    }
+    </script>
 </head>
 
 <body>
-    <div class="container">
-        <div class="input-container">
-            <div class="button-container">
-                <button id="findInputButton" class="Smallbtn">Find</button>
-                <button id="replaceInputButton" class="Smallbtn">Replace</button>
-                <button id="minifyInputButton" class="Smallbtn">Minify</button>
-                <button id="formatInputButton" class="Smallbtn">Format</button>
-            </div>
-            <div id="jsonInput" class="ace-editor"></div>
+    <a class="skip-link" href="#tool">Skip to the tool</a>
+
+    <!-- ======================= HEADER ======================= -->
+    <header class="site-header" id="siteHeader">
+        <a class="brand" href="#top" aria-label="Best JSON Formatter — home">
+            <span class="brand-mark" aria-hidden="true">{&hairsp;}</span>
+            <span class="brand-name">Best&nbsp;JSON&nbsp;Formatter</span>
+        </a>
+        <nav class="site-nav" aria-label="Primary">
+            <a href="#tool">Tool</a>
+            <a href="#features">Features</a>
+            <a href="#guide">Guide</a>
+        </nav>
+        <div class="header-actions">
+            <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle dark mode" aria-pressed="false" title="Toggle dark mode">
+                <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            </button>
+            <a class="btn btn-primary btn-sm header-cta" href="#tool">Open the tool</a>
         </div>
+    </header>
 
-        <!-- Button container in the middle -->
-        <div class="button-container-middle">
-            <div class="header">
-                <h3>Best JSON Formatter</h3>
+    <main id="top">
+        <!-- ======================= HERO ======================= -->
+        <section class="hero" aria-labelledby="heroTitle">
+            <div class="hero-inner">
+                <div class="hero-copy">
+                    <p class="eyebrow reveal">Free &middot; Ad-free &middot; Runs entirely in your browser</p>
+                    <h1 class="hero-title reveal" id="heroTitle">
+                        Make raw JSON<br>
+                        <em>readable</em> again.
+                    </h1>
+                    <p class="hero-sub reveal">
+                        Paste tangled JSON and get a clean, validated, beautifully indented
+                        document back — instantly. No sign-up, no server, nothing leaves your machine.
+                    </p>
+                    <div class="hero-ctas reveal">
+                        <a class="btn btn-primary" href="#tool">Start formatting</a>
+                        <a class="btn btn-ghost" href="#guide">How it works</a>
+                    </div>
+                    <dl class="hero-stats reveal" aria-label="Tool highlights">
+                        <div><dt>100%</dt><dd>client-side</dd></div>
+                        <div><dt>0</dt><dd>ads &amp; tracking</dd></div>
+                        <div><dt>7</dt><dd>editor themes</dd></div>
+                    </dl>
+                </div>
+
+                <!-- Purposeful visual: the product, in miniature -->
+                <div class="hero-demo reveal" aria-hidden="true">
+                    <div class="demo-window">
+                        <div class="demo-titlebar">
+                            <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
+                            <span class="demo-file">payload.json</span>
+                        </div>
+                        <div class="demo-body">
+                            <pre class="demo-pane demo-raw"><code>{"user":{"id":42,"name":"Ada","roles":["admin","editor"],"active":true},"meta":{"source":"api","ms":12}}</code></pre>
+                            <div class="demo-arrow">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+                            </div>
+                            <pre class="demo-pane demo-formatted"><code>{
+  <span class="tk-key">"user"</span>: {
+    <span class="tk-key">"id"</span>: <span class="tk-num">42</span>,
+    <span class="tk-key">"name"</span>: <span class="tk-str">"Ada"</span>,
+    <span class="tk-key">"roles"</span>: [
+      <span class="tk-str">"admin"</span>,
+      <span class="tk-str">"editor"</span>
+    ],
+    <span class="tk-key">"active"</span>: <span class="tk-bool">true</span>
+  }
+}</code></pre>
+                        </div>
+                        <div class="demo-statusbar">
+                            <span class="status-ok"><span class="status-dot"></span>Valid JSON</span>
+                            <span class="demo-meta">18 lines &middot; 2 spaces</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button id="themeToggle" class="theme-toggle-button" title="Change Theme"
-                style="font-size: larger;">🌙</button>
-            <button id="copyButton" title="Copy Formatted JSON">Copy</button>
-            <button id="uploadButton" title="Upload JSON">Upload</button>
-            <button id="validateButton" title="Validate and Format JSON"
-                style="  box-shadow: 0 0 5px rgba(255, 165, 0, 0.6);">Validate</button>
-            <button id="downloadButton" title="Download Formatted JSON">Download</button>
+        </section>
 
-            <select id="themeSelect" class="theme-dropdown" title="Select Editor Theme">
-                <option value="github">Github Theme</option>
-                <option value="monokai">Monokai</option>
-                <option value="cobalt">Cobalt Theme</option>
-                <option value="kr_theme">Kr Theme</option>
-                <option value="twilight">Twilight</option>
-                <option value="terminal">Terminal</option>
-                <option value="xcode">Xcode Theme</option>
-            </select>
-            <div class="footer">
-                <span>Made by Phaneendra</span>
-                <div class="github-icons">
-                    <a href="https://github.com/phaneendramarri" target="_blank" class="github-icon"
-                        title="Author's Github">
-                        <img src="assests/Github.svg" alt="GitHub" />
+        <!-- ======================= TOOL ======================= -->
+        <section class="tool-section" id="tool" aria-labelledby="toolTitle">
+            <div class="section-head">
+                <p class="eyebrow">The workbench</p>
+                <h2 class="section-title" id="toolTitle">Paste. Format. Ship it.</h2>
+                <p class="section-sub">Your input is formatted live as you type. Everything stays on your device.</p>
+            </div>
+
+            <div class="workbench">
+                <!-- Toolbar -->
+                <div class="toolbar" role="toolbar" aria-label="JSON actions">
+                    <div class="toolbar-group">
+                        <button id="validateButton" class="btn btn-primary btn-sm" type="button" title="Validate and format JSON">Validate</button>
+                        <button id="copyButton" class="btn btn-ghost btn-sm" type="button" title="Copy formatted JSON">Copy</button>
+                        <button id="downloadButton" class="btn btn-ghost btn-sm" type="button" title="Download formatted JSON">Download</button>
+                        <button id="uploadButton" class="btn btn-ghost btn-sm" type="button" title="Upload a .json file">Upload</button>
+                    </div>
+                    <div class="toolbar-group">
+                        <label class="select-label" for="themeSelect">Editor theme</label>
+                        <select id="themeSelect" class="select" title="Select editor theme">
+                            <option value="github">GitHub</option>
+                            <option value="monokai">Monokai</option>
+                            <option value="cobalt">Cobalt</option>
+                            <option value="kr_theme">Kr</option>
+                            <option value="twilight">Twilight</option>
+                            <option value="terminal">Terminal</option>
+                            <option value="xcode">Xcode</option>
+                        </select>
+                        <button id="focusAllButton" class="chip chip-focus" type="button" title="Fullscreen — both editors side by side (Esc to exit)" aria-label="Expand both editors to fullscreen">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                            Fullscreen
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile pane switcher -->
+                <div class="pane-tabs" role="tablist" aria-label="Editor panes">
+                    <button class="pane-tab is-active" id="tabInput" type="button" role="tab" aria-selected="true" aria-controls="inputPane" data-pane="input">Input</button>
+                    <button class="pane-tab" id="tabOutput" type="button" role="tab" aria-selected="false" aria-controls="outputPane" data-pane="output">Output</button>
+                </div>
+
+                <!-- Panes -->
+                <div class="panes">
+                    <section class="pane is-active" id="inputPane" role="tabpanel" aria-labelledby="tabInput">
+                        <div class="pane-head">
+                            <h3 class="pane-title">Input</h3>
+                            <div class="pane-actions">
+                                <button id="findInputButton" class="chip" type="button">Find</button>
+                                <button id="replaceInputButton" class="chip" type="button">Replace</button>
+                                <button id="minifyInputButton" class="chip" type="button">Minify</button>
+                                <button id="formatInputButton" class="chip" type="button">Format</button>
+                                <button id="focusInputButton" class="chip chip-focus" type="button" title="Focus mode — expand this editor (Esc to exit)" aria-label="Expand input editor to focus mode">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                                    Focus
+                                </button>
+                            </div>
+                        </div>
+                        <div id="jsonInput" class="ace-editor" aria-label="JSON input editor"></div>
+                    </section>
+
+                    <section class="pane" id="outputPane" role="tabpanel" aria-labelledby="tabOutput">
+                        <div class="pane-head">
+                            <h3 class="pane-title">Output</h3>
+                            <div class="pane-actions">
+                                <button id="findOutputButton" class="chip" type="button">Find</button>
+                                <button id="replaceOutputButton" class="chip" type="button">Replace</button>
+                                <button id="minifyOutputButton" class="chip" type="button">Minify</button>
+                                <button id="formatOutputButton" class="chip" type="button">Format</button>
+                                <button id="foldOutputButton" class="chip" type="button">Fold all</button>
+                                <button id="focusOutputButton" class="chip chip-focus" type="button" title="Focus mode — expand this editor (Esc to exit)" aria-label="Expand output editor to focus mode">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                                    Focus
+                                </button>
+                            </div>
+                        </div>
+                        <div id="jsonOutput" class="ace-editor" aria-label="Formatted JSON output editor"></div>
+                    </section>
+                </div>
+
+                <!-- Status bar -->
+                <div class="statusbar" aria-live="polite">
+                    <span id="statusMessage" class="status-message"><span class="status-dot" id="statusDot"></span><span id="statusText">Ready — paste JSON to begin</span></span>
+                    <span class="status-stats" id="statusStats"></span>
+                    <span class="status-hint"><kbd>F</kbd> focus editor · <kbd>Shift</kbd>+<kbd>F</kbd> fullscreen · <kbd>Esc</kbd> exit</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= FEATURES ======================= -->
+        <section class="features" id="features" aria-labelledby="featuresTitle">
+            <div class="section-head">
+                <p class="eyebrow">Why this one</p>
+                <h2 class="section-title" id="featuresTitle">Small tool, sharp edges.</h2>
+            </div>
+            <div class="feature-list">
+                <article class="feature reveal">
+                    <span class="feature-num" aria-hidden="true">01</span>
+                    <h3>Instant formatting</h3>
+                    <p>Beautify or minify as you type. Indentation, structure, and syntax highlighting update in real time — no button required.</p>
+                </article>
+                <article class="feature reveal">
+                    <span class="feature-num" aria-hidden="true">02</span>
+                    <h3>Honest validation</h3>
+                    <p>Invalid JSON is reported with the exact line and column, and your input is never destroyed in the process.</p>
+                </article>
+                <article class="feature reveal">
+                    <span class="feature-num" aria-hidden="true">03</span>
+                    <h3>Private by design</h3>
+                    <p>Everything runs locally in your browser. Your data never touches a server, and there are no ads or trackers.</p>
+                </article>
+                <article class="feature reveal">
+                    <span class="feature-num" aria-hidden="true">04</span>
+                    <h3>A real editor</h3>
+                    <p>Powered by Ace: find &amp; replace, code folding, seven themes, and a dark mode that respects your eyes at 2&nbsp;a.m.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- ======================= GUIDE ======================= -->
+        <section class="guide" id="guide" aria-labelledby="guideTitle">
+            <div class="section-head">
+                <p class="eyebrow">Guide</p>
+                <h2 class="section-title" id="guideTitle">Three steps, ten seconds.</h2>
+            </div>
+            <ol class="steps">
+                <li class="step reveal">
+                    <span class="step-num" aria-hidden="true">1</span>
+                    <div>
+                        <h3>Paste or upload</h3>
+                        <p>Drop raw JSON into the input pane, or upload a <code>.json</code> file straight from disk.</p>
+                    </div>
+                </li>
+                <li class="step reveal">
+                    <span class="step-num" aria-hidden="true">2</span>
+                    <div>
+                        <h3>Format &amp; validate</h3>
+                        <p>The output pane updates live. Hit <strong>Validate</strong> for a clear verdict — with line and column when something's wrong.</p>
+                    </div>
+                </li>
+                <li class="step reveal">
+                    <span class="step-num" aria-hidden="true">3</span>
+                    <div>
+                        <h3>Copy or download</h3>
+                        <p>Take the clean result with you — copy it to the clipboard or save it as a formatted file.</p>
+                    </div>
+                </li>
+            </ol>
+            <div class="guide-cta reveal">
+                <a class="btn btn-primary" href="#tool">Try it now</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- ======================= FOOTER ======================= -->
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <!-- Brand & author -->
+            <div class="footer-col footer-brand">
+                <a class="brand" href="#top" aria-label="Best JSON Formatter — home">
+                    <span class="brand-mark" aria-hidden="true">{&hairsp;}</span>
+                    <span class="brand-name">Best&nbsp;JSON&nbsp;Formatter</span>
+                </a>
+                <p class="footer-tag">
+                    A fast, free, ad-free JSON formatter that runs entirely in your browser —
+                    built by <strong>Phaneendra Marri</strong>.
+                </p>
+                <div class="social-links">
+                    <a href="https://github.com/phaneendramarri" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub — @phaneendramarri" aria-label="GitHub">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
                     </a>
-                    <a href="https://github.com/phaneendramarri/jsonr" target="_blank" class="github-icon"
-                        title="Code">
-                        <img src="assests/Source_code.svg" alt="GitHub" />
+                    <a href="https://twitter.com/phaneendra73_" target="_blank" rel="noopener noreferrer" class="social-btn" title="Twitter / X — @phaneendra73_" aria-label="Twitter / X">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </a>
+                    <a href="https://in.linkedin.com/in/phaneendramarri" target="_blank" rel="noopener noreferrer" class="social-btn" title="LinkedIn — Phaneendra Marri" aria-label="LinkedIn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                    <a href="https://www.instagram.com/tech_telusa/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram — tech_telusa" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="0.6" fill="currentColor" stroke="none"/></svg>
                     </a>
                 </div>
             </div>
 
-        </div>
-
-        <div class="output-container">
-            <div class="button-container">
-                <button id="findOutputButton" class="Smallbtn">Find</button>
-                <button id="replaceOutputButton" class="Smallbtn">Replace</button>
-                <button id="minifyOutputButton" class="Smallbtn">Minify</button>
-                <button id="formatOutputButton" class="Smallbtn">Format</button>
-                <button id="foldOutputButton" class="Smallbtn">Fold All Obj</button>
+            <!-- Explore -->
+            <div class="footer-col">
+                <h4 class="footer-heading">Explore</h4>
+                <nav class="footer-nav" aria-label="Footer">
+                    <a href="#tool">The Tool</a>
+                    <a href="#features">Features</a>
+                    <a href="#guide">Guide</a>
+                    <a href="https://github.com/phaneendramarri/jsonr" target="_blank" rel="noopener noreferrer">Source Code</a>
+                </nav>
             </div>
-            <div id="jsonOutput" class="ace-editor"></div>
-        </div>
-    </div>
 
-    <input type="file" id="uploadFile" accept=".json" />
+            <!-- Actions -->
+            <div class="footer-col footer-actions">
+                <h4 class="footer-heading">Actions</h4>
+                <button id="footerFullscreen" class="btn btn-ghost btn-sm" type="button">
+                    Fullscreen editor
+                </button>
+                <button id="backToTop" class="btn btn-ghost btn-sm" type="button">
+                    Back to top
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m-7 7 7-7 7 7"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; <span id="footerYear">2026</span> Best JSON Formatter — crafted by <strong>Phaneendra Marri</strong>.</p>
+            <p class="footer-shortcut"><kbd>F</kbd> focus &middot; <kbd>Shift</kbd>+<kbd>F</kbd> fullscreen &middot; <kbd>Esc</kbd> exit</p>
+        </div>
+    </footer>
+
+    <input type="file" id="uploadFile" accept=".json,application/json" hidden />
     <script src="index.js"></script>
 </body>
 
