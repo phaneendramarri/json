@@ -1,0 +1,12 @@
+{
+  "name": "Best JSON Formatter",
+  "short_name": "JSON Formatter",
+  "description": "Format, validate, and minify JSON in your browser.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FAF9F6",
+  "theme_color": "#00C96E",
+  "icons": [
+    { "src": "assests/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
